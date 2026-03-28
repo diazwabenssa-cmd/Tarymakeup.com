@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Makeup by Tarry</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#faf6f1; --card:#fff; --gold:#b8924a; --gold2:#d4aa6a;
+  --rose:#c4909a; --dusty:#8b5e6a; --text:#2d1f1f; --mid:#6b5050;
+  --muted:#a08070; --border:rgba(184,146,74,0.2); --green:#5a9e6f; --red:#e05555;
+}
+body { background:var(--bg); font-family:'DM Sans',sans-serif; color:var(--text); min-height:100vh; }
+
+/* LOGIN */
+#loginPage {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:24px; background:linear-gradient(160deg,#fdf8f2,#f0dfd4);
+}
+.login-box {
+  background:var(--card); border-radius:24px; padding:40px 32px;
+  width:100%; max-width:360px;
+  box-shadow:0 8px 40px rgba(184,146,74,0.12);
+  border:1px solid var(--border); text-align:center;
+}
+.login-brand { font-family:'Cormorant Garamond',serif; font-size:26px; font-style:italic; font-weight:300; color:var(--text); margin-bottom:4px; }
+.login-brand span { color:var(--gold); }
+.login-sub { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:28px; }
+.login-field { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; text-align:left; }
+.login-field label { font-size:11px; color:var(--muted); letter-spacing:0.5px; }
+.login-field input { background:var(--bg); border:1.5px solid var(--border); border-radius:10px; padding:13px 14px; font-size:13px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
+.login-field input:focus { border-color:var(--gold); }
+.login-btn { width:100%; background:linear-gradient(135deg,var(--dusty),var(--rose)); color:#fff; font-size:12px; font-weight:600; letter-spacing:2px; text-transform:uppercase; padding:15px; border-radius:12px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; margin-top:8px; transition:opacity 0.2s; }
+.login-btn:hover { opacity:0.88; }
+.login-err { font-size:11px; color:var(--red); margin-top:8px; display:none; }
+
+/* ADMIN */
+#adminPage { display:none; }
+.admin-nav {
+  background:rgba(250,246,241,0.95); backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border); padding:14px clamp(16px,5vw,28px);
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100;
+}
+.admin-brand { font-family:'Cormorant Garamond',serif; font-size:18px; font-style:italic; color:var(--text); }
+.admin-brand span { color:var(--gold); }
+.logout-btn { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); background:none; border:1px solid var(--border); padding:7px 14px; border-radius:20px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+.logout-btn:hover { border-color:var(--red); color:var(--red); }
+
+.admin-body { padding:clamp(20px,5vw,32px) clamp(16px,5vw,28px); max-width:580px; margin:0 auto; display:flex; flex-direction:column; gap:20px; }
+
+/* STATS */
+.stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.stat-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center; box-shadow:0 1px 8px rgba(184,146,74,0.06); }
+.stat-num { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:400; color:var(--gold); }
+.stat-lbl { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-top:2px; }
+
+/* SECTION TITLE */
+.sec-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-style:italic; color:var(--text); margin-bottom:12px; }
+
+/* BOOKING CARDS */
+.booking-list { display:flex; flex-direction:column; gap:10px; }
+.booking-card {
+  background:var(--card); border:1.5px solid var(--border);
+  border-radius:16px; overflow:hidden;
+  box-shadow:0 1px 10px rgba(184,146,74,0.06);
+}
+.bc-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px; border-bottom:1px solid rgba(184,146,74,0.1);
+  gap:10px; flex-wrap:wrap;
+}
+.bc-date { font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:500; color:var(--text); }
+.bc-status {
+  font-size:9px; font-weight:600; letter-spacing:1.5px;
+  text-transform:uppercase; padding:4px 12px; border-radius:20px;
+}
+.status-pending { background:rgba(212,170,106,0.15); color:var(--gold); }
+.status-confirmed { background:rgba(90,158,111,0.15); color:var(--green); }
+.bc-body { padding:14px 18px; display:flex; flex-direction:column; gap:6px; }
+.bc-row { display:flex; gap:8px; font-size:12px; }
+.bc-label { color:var(--muted); min-width:90px; flex-shrink:0; font-weight:400; }
+.bc-val { color:var(--text); font-weight:400; }
+.bc-actions { display:flex; gap:8px; padding:12px 18px; border-top:1px solid rgba(184,146,74,0.1); }
+.btn-confirm { flex:1; background:linear-gradient(135deg,#5a9e6f,#4a8e5f); color:#fff; font-size:11px; font-weight:600; letter-spacing:1px; padding:11px; border-radius:10px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; transition:opacity 0.2s; }
+.btn-confirm:hover { opacity:0.85; }
+.btn-reject { flex:1; background:rgba(224,85,85,0.1); color:var(--red); font-size:11px; font-weight:600; letter-spacing:1px; padding:11px; border-radius:10px; border:1px solid rgba(224,85,85,0.2); cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+.btn-reject:hover { background:rgba(224,85,85,0.18); }
+.btn-confirmed-done { flex:1; background:rgba(90,158,111,0.1); color:var(--green); font-size:11px; font-weight:500; padding:11px; border-radius:10px; border:1px solid rgba(90,158,111,0.2); font-family:'DM Sans',sans-serif; text-align:center; }
+
+/* LOCKED DATES */
+.locked-list { display:flex; flex-direction:column; gap:8px; }
+.locked-row { background:var(--card); border:1.5px solid var(--border); border-radius:12px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.locked-date { font-size:13px; color:var(--text); font-weight:500; }
+.btn-unlock { font-size:10px; font-weight:600; letter-spacing:1px; color:var(--red); background:rgba(224,85,85,0.08); border:1px solid rgba(224,85,85,0.2); padding:6px 14px; border-radius:20px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+.btn-unlock:hover { background:rgba(224,85,85,0.15); }
+
+/* ADD DATE */
+.add-date-box { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:12px; }
+.add-date-box label { font-size:11px; color:var(--muted); }
+.add-date-row { display:flex; gap:10px; }
+.add-date-row input { flex:1; background:var(--bg); border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; font-size:13px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
+.add-date-row input:focus { border-color:var(--gold); }
+.btn-add-date { background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#fff; font-size:11px; font-weight:600; letter-spacing:1px; padding:12px 20px; border-radius:10px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; white-space:nowrap; transition:opacity 0.2s; }
+.btn-add-date:hover { opacity:0.88; }
+
+
+/* DISKON MANAGER */
+.diskon-form { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:12px; }
+.diskon-form label { font-size:11px; color:var(--muted); margin-bottom:2px; }
+.diskon-form input, .diskon-form select, .diskon-form textarea {
+  background:var(--bg); border:1.5px solid var(--border); border-radius:10px;
+  padding:11px 14px; font-size:13px; color:var(--text);
+  font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s;
+  -webkit-appearance:none;
+}
+.diskon-form input:focus { border-color:var(--gold); }
+.diskon-toggle { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:var(--card); border:1.5px solid var(--border); border-radius:12px; }
+.diskon-toggle-label { font-size:13px; color:var(--text); font-weight:500; }
+.toggle-switch { position:relative; width:44px; height:24px; cursor:pointer; }
+.toggle-switch input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; inset:0; background:#ddd; border-radius:24px; transition:background 0.3s; }
+.toggle-slider::before { content:''; position:absolute; width:18px; height:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:transform 0.3s; }
+.toggle-switch input:checked + .toggle-slider { background:var(--green); }
+.toggle-switch input:checked + .toggle-slider::before { transform:translateX(20px); }
+.diskon-preview { background:linear-gradient(135deg,var(--dusty),var(--rose)); border-radius:14px; padding:16px; color:#fff; display:none; }
+.diskon-preview.show { display:block; }
+.dp-title { font-size:10px; letter-spacing:2px; text-transform:uppercase; opacity:0.75; margin-bottom:4px; }
+.dp-main { font-family:'Cormorant Garamond',serif; font-size:28px; font-style:italic; font-weight:300; }
+.dp-period { font-size:11px; opacity:0.8; margin-top:4px; }
+.btn-save-diskon { background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#fff; font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; padding:13px; border-radius:10px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; transition:opacity 0.2s; }
+.btn-save-diskon:hover { opacity:0.88; }
+.empty-state { text-align:center; padding:32px; font-size:13px; color:var(--muted); font-style:italic; }
+
+/* TOAST */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--text); color:#fff; font-size:12px; padding:12px 24px; border-radius:30px; z-index:999; transition:transform 0.3s; white-space:nowrap; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-brand">Pl <span>Make up</span></div>
+    <div class="login-sub">Admin Panel</div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="pwInput" placeholder="Masukkan password..." onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Masuk</button>
+    <div class="login-err" id="loginErr">Password salah, coba lagi.</div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="adminPage">
+  <nav class="admin-nav">
+    <div class="admin-brand">Pl <span>Make up</span> · Admin</div>
+    <button class="logout-btn" onclick="doLogout()">Keluar</button>
+  </nav>
+  <div class="admin-body">
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="statPending">0</div><div class="stat-lbl">Menunggu</div></div>
+      <div class="stat-card"><div class="stat-num" id="statConfirmed">0</div><div class="stat-lbl">Dikonfirmasi</div></div>
+      <div class="stat-card"><div class="stat-num" id="statLocked">0</div><div class="stat-lbl">Tgl Terkunci</div></div>
+    </div>
+
+    <!-- BOOKING MASUK -->
+    <div>
+      <div class="sec-title">📋 Booking Masuk</div>
+      <div class="booking-list" id="bookingList">
+        <div class="empty-state">Belum ada booking masuk</div>
+      </div>
+    </div>
+
+    <!-- TANGGAL TERKUNCI -->
+    <div>
+      <div class="sec-title">🔒 Tanggal Terkunci</div>
+      <div class="locked-list" id="lockedList">
+        <div class="empty-state">Belum ada tanggal terkunci</div>
+      </div>
+    </div>
+
+
+    <!-- KELOLA DISKON -->
+    <div>
+      <div class="sec-title">🏷️ Kelola Promo & Diskon</div>
+      <div class="diskon-form">
+        <div class="diskon-toggle">
+          <div class="diskon-toggle-label">Aktifkan Promo Diskon</div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="diskonAktif" onchange="previewDiskon()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="field">
+          <label>Besaran Diskon (%)</label>
+          <select id="diskonPersen" onchange="previewDiskon()">
+            <option value="10">10%</option>
+            <option value="15">15%</option>
+            <option value="20" selected>20%</option>
+            <option value="25">25%</option>
+            <option value="30">30%</option>
+            <option value="50">50%</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Deskripsi Promo</label>
+          <input type="text" id="diskonDesc" placeholder="cth: Promo Wisuda April 2025" oninput="previewDiskon()">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="field">
+            <label>Tanggal Mulai</label>
+            <input type="date" id="diskonMulai" onchange="previewDiskon()">
+          </div>
+          <div class="field">
+            <label>Tanggal Selesai</label>
+            <input type="date" id="diskonSelesai" onchange="previewDiskon()">
+          </div>
+        </div>
+        <!-- Preview -->
+        <div class="diskon-preview" id="diskonPreview">
+          <div class="dp-title">✨ Preview Tampilan</div>
+          <div class="dp-main" id="dpMain">-20% Off</div>
+          <div class="dp-period" id="dpPeriod"></div>
+        </div>
+        <button class="btn-save-diskon" onclick="saveDiskon()">💾 Simpan Pengaturan Promo</button>
+      </div>
+    </div>
+
+    <!-- KUNCI TANGGAL MANUAL -->
+    <div>
+      <div class="sec-title">➕ Kunci Tanggal Manual</div>
+      <div class="add-date-box">
+        <label>Kunci tanggal tertentu secara manual (misal: tanggal libur)</label>
+        <div class="add-date-row">
+          <input type="date" id="manualDate">
+          <button class="btn-add-date" onclick="lockManual()">Kunci</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, get, set, remove, onValue, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC3u8sWJhV3giLtf6g1GecVEpVboUrRfW8",
+    authDomain: "tarymakeup-8229c.firebaseapp.com",
+    databaseURL: "https://tarymakeup-8229c-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "tarymakeup-8229c",
+    storageBucket: "tarymakeup-8229c.firebasestorage.app",
+    messagingSenderId: "997223683848",
+    appId: "1:997223683848:web:cb8004e3c1edce20333ebd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  window._db = db;
+  window._ref = ref;
+  window._get = get;
+  window._set = set;
+  window._remove = remove;
+  window._onValue = onValue;
+  window._push = push;
+
+  // Load data realtime setelah login
+
+  // Load & save diskon
+  window.loadDiskon = async function() {
+    const snap = await get(ref(db, 'diskon'));
+    if (snap.exists()) {
+      const d = snap.val();
+      document.getElementById('diskonAktif').checked = d.aktif || false;
+      document.getElementById('diskonPersen').value = d.persen || '20';
+      document.getElementById('diskonDesc').value = d.deskripsi || '';
+      document.getElementById('diskonMulai').value = d.tglMulai || '';
+      document.getElementById('diskonSelesai').value = d.tglSelesai || '';
+      previewDiskon();
+    }
+  };
+
+  window.saveDiskon = async function() {
+    const data = {
+      aktif: document.getElementById('diskonAktif').checked,
+      persen: document.getElementById('diskonPersen').value,
+      deskripsi: document.getElementById('diskonDesc').value,
+      tglMulai: document.getElementById('diskonMulai').value,
+      tglSelesai: document.getElementById('diskonSelesai').value,
+    };
+    await set(ref(db, 'diskon'), data);
+    showToast('✅ Pengaturan promo berhasil disimpan!');
+  };
+
+  window.loadAdminData = function() {
+    window.loadDiskon();
+    // Bookings
+    onValue(ref(db, 'bookings'), (snap) => {
+      const data = snap.val() || {};
+      renderBookings(data);
+    });
+    // Locked dates
+    onValue(ref(db, 'bookedDates'), (snap) => {
+      const data = snap.val() || {};
+      renderLockedDates(data);
+    });
+  };
+
+  window.confirmBooking = async function(key, tgl) {
+    await set(ref(db, 'bookings/' + key + '/status'), 'confirmed');
+    await set(ref(db, 'bookedDates/' + tgl), true);
+    showToast('✅ Tanggal ' + tgl + ' dikonfirmasi & dikunci!');
+  };
+
+  window.rejectBooking = async function(key) {
+    if (!confirm('Hapus booking ini?')) return;
+    await remove(ref(db, 'bookings/' + key));
+    showToast('🗑️ Booking dihapus');
+  };
+
+  window.unlockDate = async function(tgl) {
+    if (!confirm('Buka kunci tanggal ' + tgl + '?')) return;
+    await remove(ref(db, 'bookedDates/' + tgl));
+    showToast('🔓 Tanggal ' + tgl + ' dibuka kembali');
+  };
+
+  window.lockManual = async function() {
+    const tgl = document.getElementById('manualDate').value;
+    if (!tgl) { showToast('Pilih tanggal dulu ya'); return; }
+    await set(ref(db, 'bookedDates/' + tgl), true);
+    document.getElementById('manualDate').value = '';
+    showToast('🔒 Tanggal ' + tgl + ' berhasil dikunci');
+  };
+</script>
+
+<script>
+// ── Password (ganti sesuai keinginan) ──
+const ADMIN_PASSWORD = 'tarry2025';
+
+
+function previewDiskon() {
+  const aktif = document.getElementById('diskonAktif').checked;
+  const persen = document.getElementById('diskonPersen').value;
+  const desc = document.getElementById('diskonDesc').value;
+  const mulai = document.getElementById('diskonMulai').value;
+  const selesai = document.getElementById('diskonSelesai').value;
+  const preview = document.getElementById('diskonPreview');
+  if (aktif) {
+    preview.classList.add('show');
+    document.getElementById('dpMain').textContent = '-' + persen + '% ' + (desc || 'Promo Spesial');
+    if (mulai && selesai) {
+      const fmt = (t) => new Date(t).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+      document.getElementById('dpPeriod').textContent = '📅 ' + fmt(mulai) + ' — ' + fmt(selesai);
+    }
+  } else {
+    preview.classList.remove('show');
+  }
+}
+
+function doLogin() {
+  const pw = document.getElementById('pwInput').value;
+  if (pw === ADMIN_PASSWORD) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminPage').style.display = 'block';
+    window.loadAdminData();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+  }
+}
+
+function doLogout() {
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('adminPage').style.display = 'none';
+  document.getElementById('pwInput').value = '';
+}
+
+// ── Render Bookings ──
+function renderBookings(data) {
+  const list = document.getElementById('bookingList');
+  const keys = Object.keys(data);
+
+  let pending = 0, confirmed = 0;
+  keys.forEach(k => { if (data[k].status === 'confirmed') confirmed++; else pending++; });
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statConfirmed').textContent = confirmed;
+
+  if (keys.length === 0) {
+    list.innerHTML = '<div class="empty-state">Belum ada booking masuk</div>';
+    return;
+  }
+
+  // Urutkan terbaru dulu
+  keys.sort((a,b) => (data[b].createdAt || 0) - (data[a].createdAt || 0));
+
+  list.innerHTML = keys.map(key => {
+    const b = data[key];
+    const isConfirmed = b.status === 'confirmed';
+    const tglFmt = b.tanggal ? new Date(b.tanggal).toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '-';
+    return `
+    <div class="booking-card">
+      <div class="bc-head">
+        <div class="bc-date">📅 ${tglFmt}</div>
+        <div class="bc-status ${isConfirmed ? 'status-confirmed' : 'status-pending'}">${isConfirmed ? '✓ Dikonfirmasi' : '⏳ Menunggu'}</div>
+      </div>
+      <div class="bc-body">
+        <div class="bc-row"><span class="bc-label">Nama</span><span class="bc-val">${b.nama || '-'}</span></div>
+        <div class="bc-row"><span class="bc-label">Paket</span><span class="bc-val">${b.paket || '-'}</span></div>
+        <div class="bc-row"><span class="bc-label">Acara</span><span class="bc-val">${b.acara || '-'}</span></div>
+        <div class="bc-row"><span class="bc-label">No HP</span><span class="bc-val">${b.hp || '-'}</span></div>
+        <div class="bc-row"><span class="bc-label">Jam MUA</span><span class="bc-val">${b.jamMU || '-'} WIB</span></div>
+        <div class="bc-row"><span class="bc-label">Alamat</span><span class="bc-val">${b.alamat || '-'}</span></div>
+      </div>
+      <div class="bc-actions">
+        ${isConfirmed
+          ? `<div class="btn-confirmed-done">✅ Sudah Dikonfirmasi</div>`
+          : `<button class="btn-confirm" onclick="confirmBooking('${key}','${b.tanggal}')">✅ Konfirmasi & Kunci</button>`
+        }
+        <button class="btn-reject" onclick="rejectBooking('${key}')">🗑️ Hapus</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Render Locked Dates ──
+function renderLockedDates(data) {
+  const list = document.getElementById('lockedList');
+  const keys = Object.keys(data).sort();
+  document.getElementById('statLocked').textContent = keys.length;
+
+  if (keys.length === 0) {
+    list.innerHTML = '<div class="empty-state">Belum ada tanggal terkunci</div>';
+    return;
+  }
+  list.innerHTML = keys.map(tgl => {
+    const fmt = new Date(tgl).toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    return `<div class="locked-row">
+      <div class="locked-date">🔒 ${fmt}</div>
+      <button class="btn-unlock" onclick="unlockDate('${tgl}')">Buka Kunci</button>
+    </div>`;
+  }).join('');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
